@@ -4,9 +4,11 @@ use FileHandle;
 use Carp 'croak';
 use vars qw[$VERSION];
 # use Debug::ShowStuff ':all';
+use overload '@{}' => sub { $_[0]->{lines} };
+
 
 # version
-$VERSION = '1.00';
+$VERSION = '1.10';
 
 
 # documentation is at the end of the file
@@ -91,6 +93,47 @@ DESTROY {
 #------------------------------------------------------------------------------
 
 
+###############################################################################
+# File::LineEdit::Tie
+# 
+package File::LineEdit::Tie;
+use strict;
+
+sub TIEARRAY {
+	my ($class, $path) = @_;
+	my $self = bless({}, $class);
+	
+	$self->{'le'} = File::LineEdit->new($path);
+	$self->{'lines'} = $self->{'le'}->{'lines'};
+	
+	return $self;
+}
+
+sub FETCHSIZE { scalar @{$_[0]->{'lines'}} }
+sub STORESIZE { $#{$_[0]->{'lines'}} = $_[1]-1 }
+sub STORE     { $_[0]->{'lines'}->[$_[1]] = $_[2] }
+sub FETCH     { $_[0]->{'lines'}->[$_[1]] }
+sub CLEAR     { @{$_[0]->{'lines'}} = () }
+sub POP       { pop(@{$_[0]->{'lines'}}) }
+sub PUSH      { my $o = shift; push(@{$o->{'lines'}},@_) }
+sub SHIFT     { shift(@{$_[0]->{'lines'}}) }
+sub UNSHIFT   { my $o = shift; unshift(@{$o->{'lines'}},@_) }
+sub EXISTS    { exists $_[0]->{'lines'}->[$_[1]] }
+sub DELETE    { delete $_[0]->{'lines'}->[$_[1]] }
+
+sub SPLICE {
+	my $ob  = shift;
+	my $sz  = $ob->FETCHSIZE;
+	my $off = @_ ? shift : 0;
+	$off   += $sz if $off < 0;
+	my $len = @_ ? shift : $sz-$off;
+	return splice(@{$ob->{'lines'}},$off,$len,@_);
+}
+
+# 
+# File::LineEdit::Tie
+###############################################################################
+
 
 
 # return true
@@ -106,10 +149,14 @@ File::LineEdit - Small utility for editing each line of a file
 =head1 SYNOPSIS
 
  my $le = File::LineEdit->new('myfile.txt');
-
- foreach my $line (@{$le->{'lines'}}) {
-     $line =~ s|foo|bar|;
- }
+ foreach my $line (@$le)
+	{$line =~ s|foo|bar|}
+ 
+ my (@le);
+ tie @le, 'File::LineEdit::Tie', 'myfile.txt';
+ foreach my $line (@le)
+	{$line =~ s|foo|bar|}
+ untie @le;
 
 =head1 INSTALLATION
 

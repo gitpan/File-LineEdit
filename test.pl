@@ -6,7 +6,7 @@ use Test;
 BEGIN { plan tests => 1 };
 
 # variables
-my ($le, $testpath, $testfile);
+my (@le, $testpath, $testfile);
 $testpath = 'test.txt';
 
 # output test data
@@ -17,10 +17,12 @@ foreach my $letter ('a' .. 'e')
 undef $testfile;
 
 # modify test file
-$le = File::LineEdit->new($testpath);
-foreach my $line (@{$le->{'lines'}})
+tie @le, 'File::LineEdit::Tie', $testpath;
+
+foreach my $line (@le)
 	{$line = uc($line)}
-undef $le;
+
+untie @le;
 
 # read test data
 $testfile = FileHandle->new($testpath)
@@ -35,5 +37,6 @@ foreach my $line (<$testfile>) {
 undef $testfile;
 unlink($testpath)
 	or die "unable to unlink test file: $!";
+
 
 ok(1);

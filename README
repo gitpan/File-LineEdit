@@ -1,4 +1,4 @@
-File/LineEdit version 1.00
+File/LineEdit version 1.10
 ========================
 
 NAME
@@ -6,10 +6,14 @@ NAME
 
 SYNOPSIS
      my $le = File::LineEdit->new('myfile.txt');
-
-     foreach my $line (@{$le->{'lines'}}) {
-         $line =~ s|foo|bar|;
-     }
+     foreach my $line (@$le)
+            {$line =~ s|foo|bar|}
+ 
+     my (@le);
+     tie @le, 'File::LineEdit::Tie', 'myfile.txt';
+     foreach my $line (@le)
+            {$line =~ s|foo|bar|}
+     untie @le;
 
 INSTALLATION
     File::LineEdit can be installed with the usual routine:
