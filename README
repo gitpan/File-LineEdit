@@ -1,14 +1,16 @@
-File/LineEdit version 1.10
+File/LineEdit version 1.11
 ========================
 
 NAME
     File::LineEdit - Small utility for editing each line of a file
 
 SYNOPSIS
+     # object interface
      my $le = File::LineEdit->new('myfile.txt');
      foreach my $line (@$le)
             {$line =~ s|foo|bar|}
  
+     # tied array interface
      my (@le);
      tie @le, 'File::LineEdit::Tie', 'myfile.txt';
      foreach my $line (@le)
@@ -43,8 +45,8 @@ DESCRIPTION
      # the path to the file as the only required argument.
      my $le = File::LineEdit->new('myfile.txt');
  
-     # loop through the lines array
-     foreach my $line (@{$le->{'lines'}}) {
+     # loop through the lines in the file
+     foreach my $line (@$le) {
      
          # change the line in some way
          $line =~ s|foo|bar|;
@@ -80,6 +82,17 @@ DESCRIPTION
 
      my $le = File::LineEdit->new('myfile.txt', autochomp=>0);
 
+TIED ARRAY INTERFACE
+    You can also use File::LineEdit the a tied array. Just tie your array to
+    File::LineEdit::Tie, passing the file path as the only argument:
+
+     # tied array interface
+     my (@le);
+     tie @le, 'File::LineEdit::Tie', 'myfile.txt';
+     foreach my $line (@le)
+            {$line =~ s|foo|bar|}
+     untie @le;
+
 SIMILAR MODULES
     There are a couple modules on CPAN that provide similar functionality.
     File::Searcher provides the ability to do regular expression based
@@ -105,4 +118,12 @@ AUTHORS
 VERSION
     Version 1.00 June 27, 2003
         Initial release
+
+    Version 1.11 June 30, 2003
+        Added overloading so that you can reference the LineEdit object
+        itself as if it were a reference to an array. That was Dan Brook's
+        idea. Thank Dan!
+
+        Then I took Dan's idea a step further and added the ability to tie
+        File::LineEdit to an array using File::LineEdit::Tie.
 

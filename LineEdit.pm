@@ -8,7 +8,7 @@ use overload '@{}' => sub { $_[0]->{lines} };
 
 
 # version
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 
 # documentation is at the end of the file
@@ -147,11 +147,13 @@ File::LineEdit - Small utility for editing each line of a file
 
 
 =head1 SYNOPSIS
-
+ 
+ # object interface
  my $le = File::LineEdit->new('myfile.txt');
  foreach my $line (@$le)
 	{$line =~ s|foo|bar|}
  
+ # tied array interface
  my (@le);
  tie @le, 'File::LineEdit::Tie', 'myfile.txt';
  foreach my $line (@le)
@@ -186,8 +188,8 @@ in the synopsis above, this time with a little more documentation):
  # the path to the file as the only required argument.
  my $le = File::LineEdit->new('myfile.txt');
  
- # loop through the lines array
- foreach my $line (@{$le->{'lines'}}) {
+ # loop through the lines in the file
+ foreach my $line (@$le) {
      
      # change the line in some way
      $line =~ s|foo|bar|;
@@ -224,6 +226,19 @@ add an C<autochomp> argument to the instantiation params:
  my $le = File::LineEdit->new('myfile.txt', autochomp=>0);
 
 
+=head1 TIED ARRAY INTERFACE
+
+You can also use File::LineEdit the a tied array.  Just tie your
+array to File::LineEdit::Tie, passing the file path as the 
+only argument:
+
+ # tied array interface
+ my (@le);
+ tie @le, 'File::LineEdit::Tie', 'myfile.txt';
+ foreach my $line (@le)
+	{$line =~ s|foo|bar|}
+ untie @le;
+
 =head1 SIMILAR MODULES
 
 There are a couple modules on CPAN that provide similar functionality. 
@@ -256,5 +271,16 @@ F<miko@idocs.com>
 =item Version 1.00    June 27, 2003
 
 Initial release
+
+=item Version 1.11    June 30, 2003
+
+Added overloading so that you can reference the LineEdit object itself 
+as if it were a reference to an array.  That was Dan Brook's idea.
+Thank Dan!
+
+Then I took Dan's idea a step further and added the ability to tie
+File::LineEdit to an array using File::LineEdit::Tie.
+
+=back
 
 =cut
