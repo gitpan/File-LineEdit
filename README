@@ -1,4 +1,4 @@
-File/LineEdit version 1.11
+File/LineEdit version 1.12
 ========================
 
 NAME
@@ -35,11 +35,11 @@ DESCRIPTION
     made, writing the data back to the file.
 
     The basic usage is quite simple: instantiate a File::LineEdit object,
-    loop through the $object->{'lines'} array, modifying each line however
-    your want. When the object falls out of scope, it automatically writes
-    the modified lines back to the file. Here's a simple example (actually,
-    the same example used in the synopsis above, this time with a little
-    more documentation):
+    loop through the object as if it were an array, modifying each line
+    however you want. When the object falls out of scope, it automatically
+    writes the modified lines back to the file. Here's a simple example
+    (actually, the same example used in the synopsis above, this time with a
+    little more documentation):
 
      # instantiate a File::LineEdit object, passing in 
      # the path to the file as the only required argument.
@@ -74,6 +74,18 @@ DESCRIPTION
 
      my $le = File::LineEdit->new('myfile.txt', autosave=>0);
 
+  Saving to a different file
+
+    You might prefer to slurp data in from one file, then save to another.
+    To do so, just add the "savepath" parameter to the "new()" call. For
+    example, the following command slurps from "source.txt" and saves to
+    "target.txt":
+
+     my $le = File::LineEdit->new('source.txt', savepath=>'target.txt');
+
+    You can also set the save path after object creation by setting the
+    "savepath" property:
+
   Automatic line chomping
 
     By default, LineEdit automatically chomps the end of each line when it
@@ -83,7 +95,7 @@ DESCRIPTION
      my $le = File::LineEdit->new('myfile.txt', autochomp=>0);
 
 TIED ARRAY INTERFACE
-    You can also use File::LineEdit the a tied array. Just tie your array to
+    You can also use File::LineEdit as a tied array. Just tie your array to
     File::LineEdit::Tie, passing the file path as the only argument:
 
      # tied array interface
@@ -102,9 +114,9 @@ SIMILAR MODULES
     those modules if you are interested in simplified modification of files.
 
     File::LineEdit differs from File::Searcher and File::Data in that
-    File::LineEdit focusses on line-based edits. The object of
-    File::LineEdit is to provide a simplified manner for looking at and
-    modifying files one line at a time.
+    File::LineEdit focuses on line-based edits. The object of File::LineEdit
+    is to provide a simplified manner for looking at and modifying files one
+    line at a time.
 
 TERMS AND CONDITIONS
     Copyright (c) 2003 by Miko O'Sullivan. All rights reserved. This program
@@ -115,6 +127,8 @@ TERMS AND CONDITIONS
 AUTHORS
     Miko O'Sullivan miko@idocs.com
 
+    Useful contribution by Dan Brook.
+
 VERSION
     Version 1.00 June 27, 2003
         Initial release
@@ -122,8 +136,13 @@ VERSION
     Version 1.11 June 30, 2003
         Added overloading so that you can reference the LineEdit object
         itself as if it were a reference to an array. That was Dan Brook's
-        idea. Thank Dan!
+        idea. Thanks Dan!
 
         Then I took Dan's idea a step further and added the ability to tie
         File::LineEdit to an array using File::LineEdit::Tie.
+
+    Version 1.12 July 3, 2003
+        Added ability to set the object to save to a different file than the
+        file the data was slurped from. Also tidied up documentation a
+        little.
 
